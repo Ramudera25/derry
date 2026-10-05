@@ -1,11 +1,14 @@
 """
-renderer.py — Aksen visual Derry (Fase 3A: Rich TUI).
+renderer.py — Aksen visual Derry (Fase 3A: Rich TUI + Fase 3C: tema).
 
 API tetap sama (fungsi mengembalikan string siap-print), tapi dirender
 pakai `rich` bila tersedia: Panel, Rule, Table, Markdown, Spinner.
 Fallback ke ANSI polos kalau rich tidak ada.
+Warna aksen mengikuti tema aktif (core.theme).
 """
 import shutil
+
+from core import theme
 
 try:
     from rich.console import Console as _Console
@@ -27,6 +30,7 @@ YELLOW = "\033[33m"
 DIM = "\033[2m"
 RESET = "\033[0m"
 
+# Kompatibilitas: dulu aksen hardcoded merah
 ACCENT = "bold red"
 ACCENT_DIM = "red"
 
@@ -45,27 +49,31 @@ def _width() -> int:
         return 60
 
 
-def line(color: str = RED, char: str = "─") -> str:
+def line(color: str | None = None, char: str = "─") -> str:
     if _RICH:
-        return _render(_Rule(style="red"))
-    return f"{color}{char * _width()}{RESET}"
+        return _render(_Rule(style=theme.dim()))
+    c = color or theme.ansi()
+    return f"{c}{char * _width()}{RESET}"
 
 
-def header(title: str, color: str = BOLD_RED) -> str:
+def header(title: str, color: str | None = None) -> str:
     if _RICH:
-        return _render(_Panel(_Text(title, style="bold red", justify="center"),
-                              border_style="red", padding=(0, 2)))
-    bar = line(color)
-    return f"{bar}\n{color}  {title}{RESET}\n{bar}"
+        return _render(_Panel(_Text(title, style=theme.accent(), justify="center"),
+                              border_style=theme.dim(), padding=(0, 2)))
+    c = color or theme.ansi()
+    bar = line(c)
+    return f"{bar}\n{c}  {title}{RESET}\n{bar}"
 
 
-def section(title: str, color: str = RED) -> str:
+def section(title: str, color: str | None = None) -> str:
     if _RICH:
-        return _render(_Rule(f"[red]{title}[/red]", style="red"))
+        d = theme.dim()
+        return _render(_Rule(f"[{d}]{title}[/{d}]", style=d))
     w = _width()
+    c = color or theme.ansi()
     label = f" {title} "
     pad = max((w - len(label)) // 2, 2)
-    return f"{color}{'─' * pad}{label}{'─' * pad}{RESET}"
+    return f"{c}{'─' * pad}{label}{'─' * pad}{RESET}"
 
 
 def kv(key: str, value: str, color: str = DIM) -> str:
@@ -75,14 +83,13 @@ def kv(key: str, value: str, color: str = DIM) -> str:
 
 
 def alert(message: str) -> str:
+    # Alert selalu merah (semantik bahaya), tidak ikut tema
     if _RICH:
         return _render(_Panel(_Text(message, style="bold white"),
                               title="[bold red]ALERT[/bold red]",
                               border_style="bold red"))
     return f"{BOLD_RED}{'─' * _width()}\n  {message}\n{'─' * _width()}{RESET}"
 
-
-# === Tambahan Fase 3A ===
 
 def banner() -> str:
     """Banner ASCII DERRY + subtitle, untuk awal sesi."""
@@ -95,15 +102,15 @@ def banner() -> str:
     """.strip("\n")
     if _RICH:
         return _render(_Panel(
-            _Text(art + "\nAsisten AI event-driven untuk Termux", style="bold red", justify="center"),
-            border_style="red", padding=(1, 2)))
-    return f"{BOLD_RED}{art}{RESET}\n{DIM}Asisten AI event-driven untuk Termux{RESET}"
+            _Text(art + "\nAsisten AI event-driven untuk Termux", style=theme.accent(), justify="center"),
+            border_style=theme.dim(), padding=(1, 2)))
+    return f"{theme.ansi()}{art}{RESET}\n{DIM}Asisten AI event-driven untuk Termux{RESET}"
 
 
 def provider_table(providers: dict) -> str:
     """Tabel status provider (nama, model, status key)."""
     if _RICH:
-        t = _Table(title="Provider", border_style="red", header_style="bold red")
+        t = _Table(title="Provider", border_style=theme.dim(), header_style=theme.accent())
         t.add_column("Provider", style="bold")
         t.add_column("Model")
         t.add_column("Key")
@@ -129,7 +136,8 @@ def markdown(text: str) -> str:
 def spinner(text: str = "Berpikir..."):
     """Context manager spinner rich. Pakai: with renderer.spinner(): ..."""
     if _RICH:
-        return _console.status(f"[red]{text}[/red]", spinner="dots")
+        d = theme.dim()
+        return _console.status(f"[{d}]{text}[/{d}]", spinner="dots")
     # Fallback: dummy context manager
     class _Dummy:
         def __enter__(self): print(f"{DIM}{text}{RESET}")

@@ -2,23 +2,53 @@
 # API key asli ada di config/secrets.toml (gitignored).
 # File ini aman di-commit.
 
-[providers.gemini]
-api_key = ""
-model = "gemini/gemini-flash-latest"
+[providers.atria]
+model = "Atria-Dawn-Preview"
+api_base = "https://api.atria-asi.ai/v1"
 daily_token_limit = 1000000
 priority = 1
+api_key = ""
 
-[providers.groq]
-api_key = "ISI_API_KEY_GROQ"
-model = "llama-3.3-70b-versatile"
-daily_token_limit = 500000
+[providers.gemini]
+model = "gemini/gemini-flash-latest"
+daily_token_limit = 1000000
 priority = 2
+api_key = ""
+
+[providers.llm7]
+model = "DeepSeek-V4-Flash-0731"
+api_base = "https://api.llm7.io/v1"
+daily_token_limit = 1000000
+priority = 3
+api_key = ""
+
+[providers.ollama]
+model = "gemma4:31b"
+api_base = "https://ollama.com/v1"
+daily_token_limit = 1000000
+priority = 4
+api_key = ""
+
+[providers.cohere]
+model = "command-a-03-2025"
+api_base = "https://api.cohere.com/compatibility/v1"
+daily_token_limit = 500000
+priority = 5
+api_key = ""
 
 [providers.openrouter]
-api_key = ""
 model = "openrouter/free"
+api_base = "https://openrouter.ai/api/v1"
 daily_token_limit = 200
-priority = 3
+priority = 6
+api_key = ""
+
+[providers.groq]
+model = "llama-3.3-70b-versatile"
+api_base = "https://api.groq.com/openai/v1"
+daily_token_limit = 500000
+priority = 7
+api_key = ""
 
 [triage]
 provider = "gemini"
@@ -30,3 +60,6 @@ provider = "openrouter"
 debounce_window_seconds = 8
 max_iteration_per_task = 10
 llm_call_rate_limit_per_minute = 15
+
+[ui]
+theme = "red"

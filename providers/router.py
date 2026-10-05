@@ -115,15 +115,17 @@ def _call_gemini(api_key: str, model: str, prompt: str) -> LLMResult:
 
 def _call_provider(provider: str, prompt: str) -> LLMResult:
     cfg = _SETTINGS["providers"][provider]
-    api_key = cfg["api_key"]
+    api_key = cfg.get("api_key", "")
     model = cfg["model"]
+    if not api_key or api_key.startswith("ISI_"):
+        return LLMResult(ok=False, provider=provider, error="api_key belum diisi")
 
     if provider == "gemini":
         result = _call_gemini(api_key, model, prompt)
-    elif provider == "groq":
-        result = _call_openai_compatible("https://api.groq.com/openai/v1", api_key, model, prompt)
-    elif provider == "openrouter":
-        result = _call_openai_compatible("https://openrouter.ai/api/v1", api_key, model, prompt)
+    elif cfg.get("api_base"):
+        # Semua provider OpenAI-compatible (groq, openrouter, atria, cohere,
+        # llm7, ollama) cukup definisikan api_base di settings.toml
+        result = _call_openai_compatible(cfg["api_base"], api_key, model, prompt)
     else:
         return LLMResult(ok=False, provider=provider, error=f"adapter untuk '{provider}' belum ada")
 
