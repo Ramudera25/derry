@@ -14,7 +14,7 @@ THEMES = {
     "emerald": {"accent": "bold green",  "dim": "green",  "ansi": "\033[1;32m"},
     "blue":    {"accent": "bold blue",   "dim": "blue",   "ansi": "\033[1;34m"},
 }
-DEFAULT = "red"
+DEFAULT = "gold"
 _SETTINGS = Path.home() / "derry" / "config" / "settings.toml"
 
 

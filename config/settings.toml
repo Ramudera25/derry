@@ -62,4 +62,4 @@ max_iteration_per_task = 10
 llm_call_rate_limit_per_minute = 15
 
 [ui]
-theme = "red"
+theme = "gold"

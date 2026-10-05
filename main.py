@@ -1,7 +1,9 @@
 """
 main.py — Entry point Derry.
 
+  python main.py                       Chat interaktif (sama dengan 'chat')
   python main.py chat [--continue]   Chat interaktif di terminal
+  python main.py ask \"teks\"          Jawab sekali langsung
   python main.py config list         Lihat konfigurasi
   python main.py config get <path>   Ambil nilai config
   python main.py config set <p> <v>  Ubah config (*.api_key -> secrets.toml)
@@ -59,6 +61,9 @@ def main():
     sub = ap.add_subparsers(dest="cmd")
 
     p_chat = sub.add_parser("chat", help="ngobrol interaktif di terminal")
+    p_ask = sub.add_parser("ask", help="jawab satu pertanyaan langsung")
+    p_ask.add_argument("text", nargs="+", help="pertanyaan, mis. derry ask \"apa itu fotosintesis?\"")
+
     p_chat.add_argument("--continue", dest="cont", action="store_true",
                         help="lanjutkan sesi terakhir")
 
@@ -90,7 +95,10 @@ def main():
 
     args = ap.parse_args()
 
-    if args.cmd == "chat":
+    if args.cmd == "ask":
+        from core import chat as chat_mod
+        chat_mod.ask_once(" ".join(args.text))
+    elif args.cmd == "chat":
         from core import chat as chat_mod
         chat_mod.run(continue_last=args.cont)
     elif args.cmd == "config":
@@ -136,6 +144,10 @@ def main():
         dashboard.show()
     elif args.cmd == "test":
         cmd_test()
+    elif args.cmd is None:
+        # Ketik "derry" saja langsung buka chat
+        from core import chat as chat_mod
+        chat_mod.run()
     else:
         ap.print_help()
         sys.exit(0)

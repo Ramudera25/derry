@@ -133,30 +133,45 @@ def _call_provider(provider: str, prompt: str) -> LLMResult:
     return result
 
 
-def complete(prompt: str, purpose: str = "reasoning") -> LLMResult:
+def complete(prompt: str, purpose: str = "reasoning", log=None) -> LLMResult:
     """
     Entry point utama. Coba provider berurutan sesuai priority,
     skip yang lagi cooldown, catat token usage, return hasil pertama yang sukses.
+
+    log: callable(event, provider, detail) opsional untuk log aktivitas live.
+         event salah satu dari: "try", "skip", "fail", "ok".
     """
+    def _log(event, provider="", detail=""):
+        if log:
+            try:
+                log(event, provider, detail)
+            except Exception:
+                pass
+
     if budget_tracker.is_rate_limited():
         return LLMResult(ok=False, provider="", error="circuit_breaker: terlalu banyak call/menit")
 
     for provider in _sorted_providers():
         if _is_cooling_down(provider):
+            _log("skip", provider, "cooldown")
             continue
         if budget_tracker.is_over_budget(provider):
+            _log("skip", provider, "over budget")
             continue
 
+        _log("try", provider)
+        t0 = time.time()
         result = _call_provider(provider, prompt)
+        dt = time.time() - t0
 
         if result.ok:
             budget_tracker.record_usage(provider, result.tokens_used, purpose)
-            print(renderer.kv("Provider dipakai", budget_tracker.format_indicator(provider)))
+            _log("ok", provider, f"{dt:.1f}s - {result.tokens_used} token")
             return result
 
         # Gagal -> cooldown provider ini, lanjut ke berikutnya
         _set_cooldown(provider)
-        print(renderer.kv(f"[{provider}] gagal", result.error))
+        _log("fail", provider, f"{result.error} ({dt:.1f}s)")
 
     return LLMResult(ok=False, provider="", error="semua provider gagal/cooldown")
 
