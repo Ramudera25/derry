@@ -1,0 +1,32 @@
+# === DERRY SETTINGS ===
+# API key asli ada di config/secrets.toml (gitignored).
+# File ini aman di-commit.
+
+[providers.gemini]
+api_key = ""
+model = "gemini/gemini-flash-latest"
+daily_token_limit = 1000000
+priority = 1
+
+[providers.groq]
+api_key = "ISI_API_KEY_GROQ"
+model = "llama-3.3-70b-versatile"
+daily_token_limit = 500000
+priority = 2
+
+[providers.openrouter]
+api_key = ""
+model = "openrouter/free"
+daily_token_limit = 200
+priority = 3
+
+[triage]
+provider = "gemini"
+
+[reasoning]
+provider = "openrouter"
+
+[system]
+debounce_window_seconds = 8
+max_iteration_per_task = 10
+llm_call_rate_limit_per_minute = 15

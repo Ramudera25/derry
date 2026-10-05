@@ -1,0 +1,36 @@
+# === DERRY PERMISSIONS ===
+# level: "auto" = langsung eksekusi, "confirm" = wajib izin via ntfy/Telegram
+# timeout_seconds: kalau tidak dijawab dalam waktu ini -> aksi DIBATALKAN (bukan lanjut)
+
+[actions.read_sensor]
+level = "auto"
+
+[actions.read_notification]
+level = "auto"
+
+[actions.send_message]
+level = "confirm"
+timeout_seconds = 300
+
+[actions.ui_tap_swipe]
+level = "confirm"
+timeout_seconds = 180
+
+[actions.kill_process]
+level = "confirm"
+timeout_seconds = 180
+
+[actions.uninstall_app]
+level = "confirm"
+timeout_seconds = 300
+
+[actions.file_delete]
+level = "confirm"
+timeout_seconds = 300
+
+[actions.clear_app_data]
+level = "confirm"
+timeout_seconds = 300
+
+# Aturan REFLEX (hardcoded, tidak bisa dioverride LLM/konfigurasi biasa)
+# Lihat core/reflex.py -> HARD_BLOCK_PATTERNS

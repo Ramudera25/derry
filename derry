@@ -1,0 +1,4 @@
+#!/bin/bash
+# Wrapper derry — jalankan dari mana saja:  derry chat
+cd "$HOME/derry" || exit 1
+exec python3 main.py "$@"
