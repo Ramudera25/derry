@@ -93,13 +93,13 @@ def alert(message: str) -> str:
 
 def banner() -> str:
     """Banner ASCII DERRY + subtitle, untuk awal sesi."""
-    art = r"""
-    ____  _____ ____  ____  __  __
-   |  _ \| ____|  _ \|  _ \|  \/  |
-   | | | |  _| | |_) | |_) | |\/| |
-   | |_| | |___|  _ <|  _ <| |  | |
-   |____/|_____|_| \_\_| \_\_|  |_|
-    """.strip("\n")
+    art = (
+        "######  ####### ######  ######  ##   ##\n"
+        "##   ## ##      ##   ## ##   ##   ## ##\n"
+        "##   ## #####   ######  ######     ####\n"
+        "##   ## ##      ##   ## ##   ##     ##\n"
+        "######  ####### ##   ## ##   ##     ##"
+    )
     if _RICH:
         return _render(_Panel(
             _Text(art + "\nAsisten AI event-driven untuk Termux", style=theme.accent(), justify="center"),
